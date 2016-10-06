@@ -34,6 +34,7 @@
 - name: install nvidia driver
   script: "{{ nvidia_driver_path }} -ui=none -a"
     ##creates: FIXME
+  when: nvidia_driver_path != ""
 
 - name: install CUDA
   script: "{{ cuda_installer_path }} --silent --override --toolkit --samples creates=/usr/local/cuda"
