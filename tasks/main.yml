@@ -67,3 +67,6 @@
     state: "absent"
   when: cudnn_tarball_path != ""
 
+- name: ldconfig
+  raw: 'ldconfig /usr/local/cuda/lib64'
+  become: true
