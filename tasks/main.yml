@@ -7,33 +7,29 @@
     - gcc
     - make
 
-#- name: make directory for nvidia files
-  #file:
-    #path: '~/nvidia_tmp'
-    #state: directory
+- name: make directory for nvidia files
+  file:
+    path: '~/nvidia_tmp'
+    state: directory
+  when: nvidia_driver_path != ""
 
-#- name: move nvidia driver
-  #copy:
-    #src: "{{ nvidia_driver_path }}"
-    #dest: '~/nvidia_tmp/nvidia_driver.run'
-    #mode: 700
+- name: move nvidia driver
+  copy:
+    src: "{{ nvidia_driver_path }}"
+    dest: '~/nvidia_tmp/nvidia_driver.run'
+    mode: 700
+  when: nvidia_driver_path != ""
 
-#- name: move cuda installer 
-  #copy:
-    #src: "{{ cuda_installer_path }}"
-    #dest: '~/nvidia_tmp/cuda_installer.run'
-    #mode: 700
+- name: Prompt for manual install of driver
+  pause:
+    prompt: 'Please navigate to ~/nvidia_tmp and install the nvidia driver'
+    minutes: 10 
+  when: nvidia_driver_path != ""
 
-#- name: move cuda installer patch
-  #copy:
-    #src: "{{ cuda_patch_path }}"
-    #dest: '~/nvidia_tmp/cuda_installer_patch.run'
-    #mode: 700
-  #when: cuda_patch_path != ""
-
-- name: install nvidia driver
-  script: "{{ nvidia_driver_path }} -ui=none -a"
-    ##creates: FIXME
+- name: Remove tmp files
+  file:
+    path: "~/nvidia_tmp/"
+    state: "absent"
   when: nvidia_driver_path != ""
 
 - name: install CUDA
@@ -47,8 +43,6 @@
   template:
    src: "../templates/cuda_env.sh"
    dest: "/etc/profile.d/cuda_env.sh"
-
-# FIXME run badwidthTest
 
 - name: extract cuDNN tarball
   unarchive:
