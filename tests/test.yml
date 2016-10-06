@@ -1,5 +1,12 @@
 ---
-- hosts: localhost
-  remote_user: root
+- hosts: all
+
+  vars:
+    nvidia_driver_path: '../files/NVIDIA-Linux-x86_64-367.44.run'
+    cuda_installer_path: '../files/NVIDIA_cuda_8.0.27_linux.run'
+    cuda_patch_path: '../files/NVIDIA_cuda_8.0.27.1_linux.run'
+    cudnn_tarball_path: '../files/NVIDIA_cudnn-8.0-linux-x64-v5.1.tgz'
+
   roles:
-    - spartan_cuda_role
+    - role: ../..
+      become: true

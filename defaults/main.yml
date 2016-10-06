@@ -1,2 +1,5 @@
 ---
 # defaults file for spartan_cuda_role
+
+cuda_patch_path: ""
+cudnn_tarball_path: ""

@@ -1,2 +1,74 @@
 ---
 # tasks file for spartan_cuda_role
+- name: apt dependencies
+  apt:
+    pkg: "{{ item }}"
+  with_items:
+    - gcc
+    - make
+
+#- name: make directory for nvidia files
+  #file:
+    #path: '~/nvidia_tmp'
+    #state: directory
+
+#- name: move nvidia driver
+  #copy:
+    #src: "{{ nvidia_driver_path }}"
+    #dest: '~/nvidia_tmp/nvidia_driver.run'
+    #mode: 700
+
+#- name: move cuda installer 
+  #copy:
+    #src: "{{ cuda_installer_path }}"
+    #dest: '~/nvidia_tmp/cuda_installer.run'
+    #mode: 700
+
+#- name: move cuda installer patch
+  #copy:
+    #src: "{{ cuda_patch_path }}"
+    #dest: '~/nvidia_tmp/cuda_installer_patch.run'
+    #mode: 700
+  #when: cuda_patch_path != ""
+
+- name: install nvidia driver
+  script: "{{ nvidia_driver_path }} -ui=none -a"
+    ##creates: FIXME
+
+- name: install CUDA
+  script: "{{ cuda_installer_path }} --silent --override --toolkit --samples creates=/usr/local/cuda"
+
+- name: install CUDA patch
+  script: "{{ cuda_patch_path }} --silent --accept-eula"
+  when: cuda_patch_path != ""
+
+- name: set CUDA env vars in /etc/profile.d
+  template:
+   src: "../templates/cuda_env.sh"
+   dest: "/etc/profile.d/cuda_env.sh"
+
+# FIXME run badwidthTest
+
+- name: extract cuDNN tarball
+  unarchive:
+    src: "{{ cudnn_tarball_path }}"
+    dest: "~/"
+  when: cudnn_tarball_path != ""
+
+- name: move cuDNN stuff
+  copy:
+    remote_src: yes
+    src: "~/cuda/include/cudnn.h"
+    dest: "/usr/local/cuda/include/"
+  when: cudnn_tarball_path != ""
+
+- name: move more cuDNN stuff
+  raw: 'cp ~/cuda/lib64/* /usr/local/cuda/lib64/'
+  when: cudnn_tarball_path != ""
+
+- name: delete cuDNN stuff
+  file:
+    path: "~/cuda/"
+    state: "absent"
+  when: cudnn_tarball_path != ""
+
