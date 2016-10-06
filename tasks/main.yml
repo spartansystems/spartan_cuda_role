@@ -58,7 +58,7 @@
   when: cudnn_tarball_path != ""
 
 - name: move more cuDNN stuff
-  raw: 'cp ~/cuda/lib64/* /usr/local/cuda/lib64/'
+  raw: 'cp ~/cuda/lib64/* /usr/local/cuda/lib64/ --preserve=links'
   when: cudnn_tarball_path != ""
 
 - name: delete cuDNN stuff
